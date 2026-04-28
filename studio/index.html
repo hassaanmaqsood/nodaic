@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nodaic Studio</title>
+  <link rel="shortcut icon" href="./images/modeller.svg" type="image/svg+xml">
+
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="nodaic-styles.css">
+  <link rel="stylesheet" href="nodaic-studio.css">
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="#" class="logo">
+        <div class="logo-mark">N</div>
+        <span>Nodaic</span>
+      </a>
+      <div class="nav-menu">
+        <button class="nav-menu-btn" id="saveBtn">Save</button>
+        <button class="nav-menu-btn" id="importBtn">Import</button>
+        <button class="nav-menu-btn" id="exportBtn">Export</button>
+        <button class="nav-menu-btn" id="peekNdlBtn">Peek NDL</button>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <button class="nav-btn" id="addRuntimeNavBtn">
+        <span class="material-symbols-outlined">add</span>
+        <span>Add Runtime</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── WORKSPACE ── -->
+  <div class="workspace">
+
+    <!-- Library Panel -->
+    <aside class="panel library-panel" id="libraryPanel">
+      <div class="panel-header">
+        <span class="panel-label">LIBRARY</span>
+      </div>
+      <div class="library-search-wrap">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text" class="library-search" id="librarySearch" placeholder="Search...">
+      </div>
+      <div class="library-body" id="libraryBody">
+        <!-- Sections injected here -->
+      </div>
+    </aside>
+
+    <!-- Canvas -->
+    <div class="canvas-area" id="canvasArea">
+      <graph-editor id="graphEditor"></graph-editor>
+
+      <!-- Floating canvas actions -->
+      <div class="canvas-actions">
+        <button class="canvas-btn" id="deleteBtn" title="Delete (Del)" style="display:none;">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button class="canvas-btn" id="fitBtn" title="Fit (F)">
+          <span class="material-symbols-outlined">fit_screen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Inspector Panel -->
+    <aside class="panel inspector-panel" id="inspectorPanel">
+      <div class="panel-header">
+        <span class="panel-label">INSPECTOR</span>
+      </div>
+      <div class="inspector-body" id="inspectorBody">
+        <div class="inspector-empty">
+          <span class="material-symbols-outlined">touch_app</span>
+          <span>Select a node</span>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /workspace -->
+
+  <!-- ── RUNTIMES BAR ── -->
+  <div class="runtimes-bar" id="runtimesBar">
+    <span class="runtimes-label">RUNTIMES</span>
+    <div class="runtimes-pills" id="runtimesPills">
+      <!-- pills injected here -->
+    </div>
+    <button class="runtimes-add-btn" id="addRuntimeBtn">
+      <span class="material-symbols-outlined">add</span>
+      Add
+    </button>
+  </div>
+
+  <!-- ── OUTPUT PANEL ── -->
+  <div class="output-panel" id="outputPanel">
+    <div class="output-tabs" id="outputTabs">
+      <button class="output-tab active" data-tab="output">Output</button>
+      <button class="output-tab" data-tab="errors">Errors</button>
+      <button class="output-tab" data-tab="bindings">Bindings</button>
+    </div>
+    <div class="output-body">
+      <div class="output-pane active" id="pane-output"></div>
+      <div class="output-pane" id="pane-errors"></div>
+      <div class="output-pane" id="pane-bindings">
+        <div class="bindings-header">
+          <span>Active Bindings</span>
+          <button class="btn-small" id="refreshBindingsBtn">
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+        </div>
+        <div class="bindings-list" id="bindingsList">
+          <div class="empty-msg">No active bindings</div>
+        </div>
+        <div class="bindings-footer">
+          <input type="text" id="bindEvent" placeholder="event:name">
+          <input type="text" id="bindArtifact" placeholder="artifact-id">
+          <label class="check-label">
+            <input type="checkbox" id="bindOnce"> Once
+          </label>
+          <button class="btn-primary" id="addBindingBtn">Add</button>
+        </div>
+      </div>
+    </div>
+    <button class="output-toggle" id="outputToggle" title="Toggle output">
+      <span class="material-symbols-outlined">expand_less</span>
+    </button>
+  </div>
+
+  <!-- ── ADD RUNTIME MODAL ── -->
+  <div class="modal-overlay" id="addRuntimeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Add Runtime</span>
+        <button class="modal-close" id="closeRuntimeModal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">Runtime URL</label>
+        <input type="text" class="field-input" id="runtimeUrlInput" placeholder="http://localhost:3030" value="http://localhost:3030">
+        
+        <label class="field-label">API Token (keyId.hash)</label>
+        <input type="password" class="field-input" id="runtimeTokenInput" placeholder="Enter HMAC token...">
+        
+        <div class="modal-status" id="runtimeConnectStatus"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="connectRuntimeBtn">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NDL PEEK MODAL ── -->
+  <div class="modal-overlay" id="ndlPeekModal">
+    <div class="modal modal-large">
+      <div class="modal-header">
+        <span class="modal-title">Process Definition (NDL)</span>
+        <button class="modal-close" id="closeNdlModal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre class="ndl-viewer" id="ndlViewer"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="copyNdlBtn">Copy JSON</button>
+        <button class="btn-secondary" id="downloadNdlBtn">Download .json</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ARTIFACT DETAILS MODAL ── -->
+  <div class="modal-overlay" id="artifactDetailsModal">
+    <div class="modal modal-large">
+      <div class="modal-header">
+        <span class="modal-title" id="artDetTitle">Artifact Details</span>
+        <button class="modal-close" id="closeArtDetModal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="art-det-header">
+          <span class="art-det-type-badge" id="artDetType">process</span>
+          <p class="art-det-description" id="artDetDesc"></p>
+        </div>
+        <div class="art-det-grid">
+          <div class="art-det-section">
+            <h4>Inputs</h4>
+            <ul class="art-det-list" id="artDetInputs"></ul>
+          </div>
+          <div class="art-det-section">
+            <h4>Outputs</h4>
+            <ul class="art-det-list" id="artDetOutputs"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="graph-editor-unified.js"></script>
+  <script src="nodaic.js"></script>
+  <script src="nodaic-gui.js"></script>
+  <script src="nodaic-studio.js"></script>
+</body>
+</html>
