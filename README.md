@@ -4,5 +4,7 @@ Nodaic is an execution engine where systems are modeled as networks of nodes —
 
 You define Processes (functions), connect them into a Graph via edges, and store everything in a Library; when the engine runs, each node executes its process, publishes its output, and downstream nodes automatically receive it as their input. The agent exposes this over HTTP and WebSocket, so any external event — a webhook, a schedule, a user action — can trigger the right graph in real time.
 
-Clone its [nodejs runtime](./runtime) and use it as a template for your project; you can also use [nodai studio](./studio/) for a user interface. However, be careful: this is still experimental and unstable, so DO NOT USE IT IN PRODUCTION.
+Clone its [nodejs runtime](./runtimes/node) and use it as a template for your project; you can also use [nodaic studio](./nodaic_studio/) for a user interface.
+
+In future, I would be introducing WASM runtime for browser, esp32 runtime, TUI for studio, installation of artifacts to extend built-in processes and graphs, SSO, and many more.
 

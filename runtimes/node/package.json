@@ -1,0 +1,19 @@
+{
+  "name": "@nodaic/runtime-node",
+  "version": "1.0.0",
+  "description": "Nodaic Node.js Runtime — secure execution environment for Nodaic process and graph artifacts",
+  "main": "runtime.js",
+  "scripts": {
+    "test": "node test_unified_variables_table.js && node test_secrets_api.js && node test_secrets_ndl_injection.js && node test_wildcard_domains_ips.js",
+    "start": "node runtime.js",
+    "dev": "node runtime.js"
+  },
+  "author": "Nodaic Systems",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.4.1",
+    "ws": "^8.19.0"
+  }
+}

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nodaic Studio</title>
+    <meta name="description" content="Nodaic Studio — Next-generation visual graph modeler and runtime orchestration platform with 3-Tier Hybrid Observability (Canvas Graphics + DevTools Console) and Modeler theme (#FF6B35).">
+    <meta name="keywords" content="Nodaic, graph modeler, NDL, distributed runtime, workflow orchestration, reactive graphs, devtools console">
+    <meta name="author" content="Nodaic Systems">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#FF6B35">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="./images/modeller.svg" type="image/svg">
+    <link rel="icon" type="image/svg+xml" href="./images/modeller.svg">
+    <link rel="apple-touch-icon" href="./images/modeller.svg">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Nodaic Studio">
+    <meta property="og:title" content="Nodaic Studio">
+    <meta property="og:description" content="Next-generation visual graph modeler and runtime orchestration platform with 3-Tier Hybrid Observability and Modeler theme (#FF6B35).">
+    <meta property="og:image" content="./images/modeller.svg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Nodaic Studio">
+    <meta name="twitter:description" content="Visual graph modeler and distributed runtime orchestration engine.">
+    <meta name="twitter:image" content="./images/modeller.svg">
+
+    <!-- Web App & Mobile -->
+    <meta name="application-name" content="Nodaic Studio">
+    <meta name="apple-mobile-web-app-title" content="Nodaic">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/studio.css">
+</head>
+<body>
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════════════════════ -->
+<header id="topbar">
+
+    <!-- Left: brand + runtime + breadcrumb -->
+    <div id="tb-left">
+        <div id="tb-logo" title="Nodaic Studio · Modeler Theme">
+            <svg viewBox="0 0 400 400" fill="none" class="modeller-icon" xmlns="http://www.w3.org/2000/svg">
+                <rect width="400" height="400" rx="72" fill="#FF6B35"/>
+                <path d="M0 400C201 400 200 0 400 0" stroke="#1F2937" stroke-width="34" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <button id="tb-runtime-pill" class="tb-pill" title="Switch runtime (click)">
+            <div class="pill-dot offline" id="tb-rt-dot"></div>
+            <span id="tb-rt-label">No Runtime</span>
+            <svg class="pill-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div id="tb-breadcrumb">
+            <span class="bc-sep">/</span>
+            <span class="bc-graph" id="bc-graph-label"></span>
+        </div>
+    </div>
+
+    <!-- Center: command search -->
+    <div id="tb-center">
+        <button id="cmd-trigger" class="cmd-trigger-pill" title="Command palette (⌘K)">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <span>Search graphs, commands, nodes…</span>
+            <kbd>⌘K</kbd>
+        </button>
+    </div>
+
+    <!-- Right: nav icons + actions -->
+    <div id="tb-right">
+
+        <!-- Panel triggers -->
+        <div class="tb-icon-group" role="toolbar">
+            <button class="tb-nav-btn" id="nav-graphs" data-panel="graphs" title="Graphs">
+                <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11.5l10-5M7 12.5l10 5"/></svg>
+                <span>Graphs</span>
+            </button>
+            <button class="tb-nav-btn" id="nav-library" data-panel="library" title="Node Library">
+                <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+                <span>Library</span>
+            </button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-icon-group" role="toolbar">
+            <button class="tb-nav-btn" id="nav-secrets" data-panel="secrets" title="Secrets">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Secrets</span>
+            </button>
+            <button class="tb-nav-btn" id="nav-triggers" data-panel="triggers" title="Triggers">
+                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Triggers</span>
+            </button>
+            <button class="tb-nav-btn" id="nav-roles" data-panel="roles" title="Roles" style="display:none">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Roles</span>
+            </button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-icon-group" role="toolbar">
+            <button class="tb-nav-btn" id="nav-runtimes" data-panel="runtimes" title="Runtimes">
+                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                <span>Runtimes</span>
+            </button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <!-- Actions -->
+        <button class="tb-action-btn secondary" id="deploy-btn" title="Deploy (⌘⇧D)">
+            <svg viewBox="0 0 24 24"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+            <span>Deploy</span>
+        </button>
+        <button class="tb-action-btn primary" id="run-btn" title="Run (⌘↵)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></svg>
+            <span>Run</span>
+        </button>
+    </div>
+</header>
+
+<!-- ══ STAGE (100% canvas) ═════════════════════════════════════════════════ -->
+<main id="stage">
+
+    <!-- Empty state (no runtime) -->
+    <div id="empty-state">
+        <div class="es-glyph">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="4" y="10" width="40" height="26" rx="4"/>
+                <path d="M16 40h16M24 36v4"/>
+                <circle cx="14" cy="22" r="3"/>
+                <circle cx="34" cy="22" r="3"/>
+                <path d="M17 22h14"/>
+            </svg>
+        </div>
+        <div class="es-text">
+            <h1 class="es-title">Connect a Runtime</h1>
+            <p class="es-sub">Add a Nodaic runtime to start building, deploying, and running graphs.</p>
+        </div>
+        <button class="es-cta" id="empty-connect-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Connect Runtime
+        </button>
+    </div>
+
+    <!-- Visual canvas -->
+    <div id="canvas-visual">
+        <!-- Dot-grid via CSS pseudo -->
+        <div id="vis-canvas"></div>
+
+        <!-- Link mode banner -->
+        <div id="link-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Click source port, then target port to connect
+            <button class="link-cancel" id="link-hint-cancel">Cancel</button>
+        </div>
+
+        <!-- Zoom HUD (transient) -->
+        <div id="zoom-hud">100%</div>
+    </div>
+
+    <!-- Code canvas -->
+    <div id="canvas-code">
+        <div class="code-bar">
+            <span class="code-bar-label">NDL Source</span>
+            <span id="ndl-error" class="code-bar-error"></span>
+            <div class="code-bar-actions">
+                <button class="code-bar-btn" id="force-sync-btn" title="Sync (⌘↵)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>
+                    Sync
+                </button>
+                <button class="code-bar-btn primary" id="deploy-graph-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Deploy
+                </button>
+            </div>
+        </div>
+        <div id="ndl-editor"></div>
+    </div>
+
+    <!-- Left floating toolbar (visual mode only) -->
+    <div id="canvas-toolbar" role="toolbar" aria-label="Canvas tools">
+        <button class="ctb-btn primary-action" id="ctb-add-node" title="Add Node (A)">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="ctb-btn" id="ctb-link" title="Link mode (L)">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+        <div class="ctb-sep"></div>
+        <button class="ctb-btn" id="ctb-zoom-out" title="Zoom out">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="ctb-btn" id="ctb-zoom-in" title="Zoom in">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="ctb-btn" id="ctb-fit" title="Fit to view (F)">
+            <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+        <button class="ctb-btn" id="ctb-layout" title="Auto-layout">
+            <svg viewBox="0 0 24 24"><circle cx="5" cy="8" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="5" cy="19" r="2"/><path d="M7 8h4M15 5h-4M5 10v7M19 7v10M9 19h8"/></svg>
+        </button>
+        <div class="ctb-sep"></div>
+        <!-- View mode toggle -->
+        <button class="ctb-btn view-toggle" id="ctb-view-visual" data-view="visual" title="Visual view (⌘1)">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><line x1="8" y1="7" x2="11" y2="16"/><line x1="16" y1="7" x2="13" y2="16"/></svg>
+        </button>
+        <button class="ctb-btn view-toggle" id="ctb-view-code" data-view="code" title="Code view (⌘2)">
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </button>
+        <button class="ctb-btn view-toggle" id="ctb-view-split" data-view="split" title="Split view (⌘3)">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        </button>
+    </div>
+
+    <!-- Floating inspector (bottom-right, shows on selection) -->
+    <aside id="inspector" aria-label="Inspector">
+        <div class="insp-header">
+            <div class="insp-header-left">
+                <span class="insp-kind-dot" id="insp-dot"></span>
+                <span class="insp-title" id="insp-title">Inspector</span>
+            </div>
+            <button class="insp-close-btn" id="insp-close" title="Close">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="insp-body" id="insp-body"></div>
+        <div class="insp-footer" id="insp-actions"></div>
+    </aside>
+
+    <!-- Mobile FAB (canvas actions on small screen) -->
+    <button class="fab" id="mob-fab" aria-label="Add node">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+
+</main>
+
+<!-- ══ FLOATING PANELS ══════════════════════════════════════════════════════
+     All anchored to their topbar button. Open/close via JS.
+     glass-panel-overlay dims the canvas behind any open panel.
+     ─────────────────────────────────────────────────────────────────────── -->
+<div id="glass-panel-overlay"></div>
+
+<!-- Graphs panel -->
+<div class="glass-panel" id="panel-graphs" role="dialog" aria-label="Graphs">
+    <div class="gp-head">
+        <span class="gp-title">Graphs</span>
+        <div class="gp-head-right">
+            <button class="gp-add-btn" id="gp-add-graph">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New
+            </button>
+            <button class="gp-close-btn" data-close-panel="graphs">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="gp-body" id="panel-graphs-body"></div>
+</div>
+
+<!-- Library panel -->
+<div class="glass-panel" id="panel-library" role="dialog" aria-label="Node Library">
+    <div class="gp-head">
+        <span class="gp-title">Node Library</span>
+        <button class="gp-close-btn" data-close-panel="library">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <div class="gp-search-row">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="lib-search" placeholder="Filter nodes…" autocomplete="off">
+    </div>
+    <div class="gp-body" id="panel-library-body"></div>
+</div>
+
+<!-- Secrets panel -->
+<div class="glass-panel glass-panel--wide" id="panel-secrets" role="dialog" aria-label="Secrets">
+    <div class="gp-head">
+        <span class="gp-title">Secrets</span>
+        <div class="gp-head-right">
+            <button class="gp-add-btn" id="gp-add-secret">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+            </button>
+            <button class="gp-close-btn" data-close-panel="secrets">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="gp-body" id="panel-secrets-body"></div>
+</div>
+
+<!-- Triggers panel -->
+<div class="glass-panel glass-panel--wide" id="panel-triggers" role="dialog" aria-label="Triggers">
+    <div class="gp-head">
+        <span class="gp-title">Event Triggers</span>
+        <div class="gp-head-right">
+            <button class="gp-add-btn" id="gp-add-trigger">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+            </button>
+            <button class="gp-close-btn" data-close-panel="triggers">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="gp-body" id="panel-triggers-body"></div>
+</div>
+
+<!-- Roles panel -->
+<div class="glass-panel glass-panel--wide" id="panel-roles" role="dialog" aria-label="Roles">
+    <div class="gp-head">
+        <span class="gp-title">Roles &amp; Access</span>
+        <div class="gp-head-right">
+            <button class="gp-add-btn" id="gp-add-role">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+            </button>
+            <button class="gp-close-btn" data-close-panel="roles">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="gp-body" id="panel-roles-body"></div>
+</div>
+
+<!-- Runtimes panel -->
+<div class="glass-panel" id="panel-runtimes" role="dialog" aria-label="Runtimes">
+    <div class="gp-head">
+        <span class="gp-title">Runtimes</span>
+        <div class="gp-head-right">
+            <button class="gp-add-btn" id="gp-add-runtime">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Connect
+            </button>
+            <button class="gp-close-btn" data-close-panel="runtimes">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="gp-body" id="panel-runtimes-body"></div>
+</div>
+
+<!-- Runtime picker (from runtime badge) -->
+<div class="glass-panel" id="panel-rt-picker" role="menu" aria-label="Switch runtime">
+    <div class="gp-head">
+        <span class="gp-title">Switch Runtime</span>
+        <button class="gp-close-btn" data-close-panel="rt-picker">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <div class="gp-body" id="panel-rt-picker-body"></div>
+    <div class="gp-footer">
+        <button class="gp-footer-btn" id="rt-picker-connect-btn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Connect new runtime…
+        </button>
+    </div>
+</div>
+
+<!-- ══ TIER 2: COLLAPSED RUNNING SUMMARY STRIP ══════════════════════════════ -->
+<footer id="status-strip" title="Click to toggle DevTools console drawer">
+    <div class="ss-left">
+        <span class="ss-conn-dot live" id="ss-conn-dot"></span>
+        <span class="ss-conn-label" id="ss-conn-label">Live</span>
+        <span class="ss-dot-sep">·</span>
+        <span id="ss-latency" class="ss-mono">14ms</span>
+        <span class="ss-dot-sep">·</span>
+        <span id="ss-role-chip" class="ss-chip">admin</span>
+        <span class="ss-dot-sep">·</span>
+        <span id="ss-active-graph" class="ss-mono">logger</span>
+        <span class="ss-dot-sep">·</span>
+        <span id="ss-counts" class="ss-mono">1N·0E</span>
+        <span id="ss-err-badge" class="ss-err-badge">● 0 ERR</span>
+    </div>
+    <div class="ss-right">
+        <button class="ss-console-toggle-btn" id="ss-console-toggle" title="Console (⌘\`)">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            Console
+        </button>
+    </div>
+</footer>
+
+<!-- ══ TIER 3: CHROME DEVTOOLS-INSPIRED EXPANDED CONSOLE DRAWER ═════════════ -->
+<div id="console-drawer" data-state="docked">
+    <!-- Pinned Top Filter Bar (§1 Chrome Console Design) -->
+    <div class="dt-filter-bar">
+        <div class="dt-fb-left">
+            <div class="dt-fb-search-wrap">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="dt-fb-search" class="dt-fb-input" placeholder="Filter console (text or /err)…" autocomplete="off" spellcheck="false">
+                <button class="dt-fb-clear-search" id="dt-fb-clear-search" title="Clear search">✕</button>
+            </div>
+            <div class="dt-fb-sep"></div>
+            <div class="dt-levels" role="toolbar" aria-label="Log severity levels">
+                <button class="dt-level-pill active" data-filter="all" title="All messages">All <span class="pill-count" id="dt-cnt-all">0</span></button>
+                <button class="dt-level-pill err" data-filter="err" title="Errors">Errors <span class="pill-count" id="dt-cnt-err">0</span></button>
+                <button class="dt-level-pill warn" data-filter="warn" title="Warnings">Warnings <span class="pill-count" id="dt-cnt-warn">0</span></button>
+                <button class="dt-level-pill info" data-filter="info" title="Info">Info <span class="pill-count" id="dt-cnt-info">0</span></button>
+                <button class="dt-level-pill log" data-filter="log" title="Log">Log <span class="pill-count" id="dt-cnt-log">0</span></button>
+            </div>
+            <div class="dt-scope-container" id="dt-scope-container"></div>
+        </div>
+        <div class="dt-fb-right">
+            <button class="dt-fb-btn" id="dt-clear-btn" title="Clear console (Ctrl+L)">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            </button>
+            <div class="dt-fb-sep"></div>
+            <div class="dt-settings-wrap">
+                <button class="dt-fb-btn" id="dt-settings-btn" title="Console settings & display options" aria-haspopup="true" aria-expanded="false">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="dt-settings-popover" id="dt-settings-popover" role="dialog" aria-label="Console Settings">
+                    <div class="dt-popover-title">Console Settings</div>
+                    <label class="dt-popover-item">
+                        <span>Regex Mode (<code>.*</code>)</span>
+                        <input type="checkbox" id="dt-opt-regex" class="dt-toggle-switch">
+                    </label>
+                    <label class="dt-popover-item">
+                        <span>Show Timestamps</span>
+                        <input type="checkbox" id="dt-opt-timestamps" class="dt-toggle-switch" checked>
+                    </label>
+                    <label class="dt-popover-item">
+                        <span>Compact Line Spacing</span>
+                        <input type="checkbox" id="dt-opt-compact" class="dt-toggle-switch">
+                    </label>
+                    <label class="dt-popover-item">
+                        <span>Preserve Log Across Runs</span>
+                        <input type="checkbox" id="dt-opt-preserve" class="dt-toggle-switch">
+                    </label>
+                    <div class="dt-popover-divider"></div>
+                    <button class="dt-popover-btn" id="dt-opt-shortcuts" type="button">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Shortcuts Reference (<kbd>?</kbd>)
+                    </button>
+                </div>
+            </div>
+            <button class="dt-fb-btn" id="dt-maximize-btn" title="Toggle maximize console">
+                <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+        </div>
+    </div>
+    <!-- Console Output Stream -->
+    <div id="dt-console-output"></div>
+    <!-- Input Row with Chevron Prompt -->
+    <div class="dt-input-row">
+        <span class="dt-prompt-glyph">&gt;</span>
+        <textarea id="dt-console-input" rows="1" spellcheck="false" autocomplete="off"
+            placeholder="help, run <id>, status, /err, /warn, nodes… (↵ execute, Shift+↵ newline, ↑↓ history)"></textarea>
+        <span class="dt-input-hint">↵ execute · Shift+↵ multiline</span>
+    </div>
+</div>
+
+<!-- ══ MOBILE BOTTOM TAB BAR ══════════════════════════════════════════════ -->
+<nav id="mobile-tabs" aria-label="Navigation">
+    <button class="mob-tab active" data-panel="graphs">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11.5l10-5M7 12.5l10 5"/></svg>
+        <span>Graphs</span>
+    </button>
+    <button class="mob-tab" data-panel="library">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+        <span>Library</span>
+    </button>
+    <button class="mob-tab" data-panel="secrets">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Secrets</span>
+    </button>
+    <button class="mob-tab" data-panel="triggers">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Triggers</span>
+    </button>
+    <button class="mob-tab" data-panel="runtimes">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span>Settings</span>
+    </button>
+</nav>
+
+<!-- ══ SHARED MODALS (Sheet + Confirm) ══════════════════════════════════════ -->
+<div id="sheet-overlay">
+    <div id="sheet" role="dialog" aria-modal="true">
+        <div class="sh-head">
+            <div>
+                <div class="sh-title" id="sheet-title">Panel</div>
+                <div class="sh-sub" id="sheet-sub"></div>
+            </div>
+            <button class="sh-close" id="sheet-close">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="sh-body" id="sheet-body"></div>
+        <div class="sh-foot" id="sheet-foot"></div>
+    </div>
+</div>
+
+<div id="confirm-overlay">
+    <div id="confirm-modal" role="alertdialog" aria-modal="true">
+        <div class="sh-head">
+            <div class="sh-title" id="confirm-title" style="color:var(--crimson)">Confirm</div>
+            <button class="sh-close" id="confirm-close">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="sh-body">
+            <p id="confirm-msg" style="font-size:13.5px;color:var(--ink-2);line-height:1.6"></p>
+        </div>
+        <div class="sh-foot">
+            <button class="sh-btn" id="confirm-cancel-btn">Cancel</button>
+            <button class="sh-btn danger" id="confirm-action-btn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ COMMAND PALETTE ════════════════════════════════════════════════════ -->
+<div id="cmd-overlay">
+    <div id="cmd-palette" role="dialog" aria-modal="true">
+        <div class="cmd-row">
+            <svg class="cmd-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="cmd-input" placeholder="Search graphs, commands, nodes…" autocomplete="off" spellcheck="false">
+            <kbd class="cmd-esc">Esc</kbd>
+        </div>
+        <div id="cmd-results"></div>
+        <div class="cmd-footer">
+            <span><kbd>↑↓</kbd> Navigate</span>
+            <span><kbd>↵</kbd> Open</span>
+            <span><kbd>Esc</kbd> Close</span>
+        </div>
+    </div>
+</div>
+
+<!-- ══ KEYBOARD SHORTCUTS OVERLAY ═════════════════════════════════════════ -->
+<div id="shortcuts-overlay">
+    <div id="shortcuts-modal" role="dialog" aria-modal="true" aria-label="Keyboard Shortcuts">
+        <div class="sh-head">
+            <div>
+                <div class="sh-title">Keyboard Shortcuts</div>
+                <div class="sh-sub">Reference cheat sheet for studio actions, CLI &amp; console filters</div>
+            </div>
+            <button class="sh-close" id="shortcuts-close" title="Close (Esc)">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="shortcuts-grid">
+            <div class="sc-col">
+                <div class="sc-col-title">Console &amp; CLI</div>
+                <div class="sc-row"><span>Toggle Console</span><kbd>⌘ `</kbd></div>
+                <div class="sc-row"><span>Execute Command</span><kbd>↵</kbd></div>
+                <div class="sc-row"><span>Multiline Payload</span><kbd>Shift ↵</kbd></div>
+                <div class="sc-row"><span>Command History</span><kbd>↑</kbd> <kbd>↓</kbd></div>
+                <div class="sc-row"><span>Autocomplete</span><kbd>Tab</kbd></div>
+                <div class="sc-row"><span>Clear Buffer</span><kbd>Ctrl L</kbd></div>
+                <div class="sc-row"><span>Dismiss / Reset</span><kbd>Esc</kbd></div>
+            </div>
+            <div class="sc-col">
+                <div class="sc-col-title">Prompt Slash Filters</div>
+                <div class="sc-row"><span>Filter Errors</span><code>/err</code></div>
+                <div class="sc-row"><span>Filter Warnings</span><code>/warn</code></div>
+                <div class="sc-row"><span>Filter Info</span><code>/info</code></div>
+                <div class="sc-row"><span>Show All Logs</span><code>/all</code></div>
+                <div class="sc-row"><span>Clear Output</span><code>/clear</code></div>
+                <div class="sc-row"><span>Substring Search</span><code>/&lt;query&gt;</code></div>
+            </div>
+            <div class="sc-col">
+                <div class="sc-col-title">Canvas &amp; Studio</div>
+                <div class="sc-row"><span>Command Palette</span><kbd>⌘ K</kbd></div>
+                <div class="sc-row"><span>Add Node</span><kbd>A</kbd></div>
+                <div class="sc-row"><span>Link Mode</span><kbd>L</kbd></div>
+                <div class="sc-row"><span>Fit Canvas</span><kbd>F</kbd></div>
+                <div class="sc-row"><span>Run Active Graph</span><kbd>⌘ ↵</kbd></div>
+                <div class="sc-row"><span>Deploy Graph</span><kbd>⌘ Shift D</kbd></div>
+                <div class="sc-row"><span>Visual / Code / Split</span><kbd>⌘1</kbd> <kbd>⌘2</kbd> <kbd>⌘3</kbd></div>
+                <div class="sc-row"><span>Shortcuts Help</span><kbd>?</kbd></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ TOAST ══════════════════════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script src="./scripts/studio-ui.js" type="module"></script>
+</body>
+</html>

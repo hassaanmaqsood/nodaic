@@ -1,0 +1,13 @@
+{
+  "runtimeId": "fed159",
+  "port": 3030,
+  "verbose": true,
+  "environment": "nodejs",
+  "heartbeatInterval": 30000,
+  "maxParallelRuns": null,
+  "autoRun": [],
+  "epoch": 1,
+  "revokedKeys": [],
+  "allowedOrigins": "http://localhost:3000,http://localhost:3030",
+  "allowedIPs": "127.0.0.1, 192.168.*.*"
+}
